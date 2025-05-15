@@ -17,7 +17,37 @@ TextExtractPro is a powerful OCR (Optical Character Recognition) application tha
 - FastAPI (API framework)
 - Uvicorn (ASGI server)
 - SQLAlchemy (Database ORM)
+- Tesseract OCR (OCR engine)
 - Other dependencies specified in `pyproject.toml`
+
+## Prerequisites
+
+### 1. Install Tesseract OCR
+
+#### Windows:
+1. Download the installer from [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki)
+2. Run the installer and note the installation path
+3. Add Tesseract to your system PATH:
+   - Search for "Environment Variables" in Windows
+   - Edit the PATH variable
+   - Add the Tesseract installation directory (e.g., `C:\Program Files\Tesseract-OCR`)
+
+#### Linux (Ubuntu/Debian):
+```bash
+sudo apt update
+sudo apt install tesseract-ocr
+sudo apt install libtesseract-dev
+```
+
+#### macOS:
+```bash
+brew install tesseract
+```
+
+### 2. Verify Installation
+```bash
+tesseract --version
+```
 
 ## Project Structure
 
@@ -41,9 +71,18 @@ git clone [your-repository-url]
 cd TextExtractPro
 ```
 
-2. Install dependencies:
+2. Install Python dependencies:
 ```bash
 pip install -r requirements.txt
+```
+
+3. Set environment variables (optional):
+```bash
+# Windows
+set TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
+
+# Linux/macOS
+export TESSERACT_CMD=/usr/bin/tesseract
 ```
 
 ## Running the Application
@@ -79,7 +118,22 @@ The application provides various API endpoints through FastAPI. Access the API d
 
 The application can be configured through environment variables:
 - `FLASK_SECRET_KEY`: Secret key for Flask application (default: 'dev_key_for_ocr_app')
+- `TESSERACT_CMD`: Path to Tesseract executable (if not in system PATH)
 - Additional configuration can be set in the respective configuration files
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Tesseract Not Found Error**
+   - Verify Tesseract is installed: `tesseract --version`
+   - Check if Tesseract is in your PATH
+   - Set the `TESSERACT_CMD` environment variable to the full path of the Tesseract executable
+
+2. **OCR Quality Issues**
+   - Ensure input images are clear and well-lit
+   - Try preprocessing images before OCR
+   - Consider using different Tesseract language packs for non-English text
 
 ## Development
 

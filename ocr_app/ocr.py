@@ -9,9 +9,26 @@ import io
 
 logger = logging.getLogger(__name__)
 
-# Set Tesseract path based on environment variable or use the detected path
-tesseract_cmd = os.environ.get("TESSERACT_CMD", "/nix/store/44vcjbcy1p2yhc974bcw250k2r5x5cpa-tesseract-5.3.4/bin/tesseract")
+# Set Tesseract path based on environment variable or use the Windows default path
+tesseract_cmd = os.environ.get("TESSERACT_CMD", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
+tessdata_dir = os.environ.get("TESSDATA_PREFIX", r"C:\Program Files\Tesseract-OCR\tessdata")
+
+# Ensure TESSDATA_PREFIX is set
+os.environ["TESSDATA_PREFIX"] = tessdata_dir
 pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
+
+def verify_language_pack(language):
+    """
+    Verify that the requested language pack is installed.
+    
+    Args:
+        language: Language code to verify
+        
+    Returns:
+        bool: True if language pack is available, False otherwise
+    """
+    traineddata_path = os.path.join(tessdata_dir, f"{language}.traineddata")
+    return os.path.exists(traineddata_path)
 
 def clean_text(text, fix_punctuation=True, fix_layout=True):
     """
@@ -92,6 +109,15 @@ def extract_text(image, language="eng"):
     try:
         logger.info("Starting OCR text extraction")
         
+        # Verify language pack is installed
+        if not verify_language_pack(language):
+            error_msg = (
+                f"Language pack '{language}' is not installed. Please download {language}.traineddata "
+                f"from https://github.com/tesseract-ocr/tessdata and place it in {tessdata_dir}"
+            )
+            logger.error(error_msg)
+            return f"OCR processing error: {error_msg}"
+            
         # Verify we have a valid image
         if image is None:
             raise ValueError("Image is None - cannot perform OCR")
