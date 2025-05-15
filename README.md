@@ -9,6 +9,7 @@ TextExtractPro is a powerful OCR (Optical Character Recognition) application tha
 - Flask wrapper for enhanced functionality
 - Database integration for storing results
 - Easy deployment with multiple server options
+- Docker support for containerized deployment
 
 ## Tech Stack
 
@@ -63,7 +64,31 @@ TextExtractPro/
 └── various .sh files # Server startup scripts
 ```
 
-## Installation
+## Installation Options
+
+### Option 1: Docker (Recommended)
+
+The easiest way to run TextExtractPro is using Docker. This method automatically sets up all dependencies, including Tesseract OCR and language packs.
+
+1. Install Docker and Docker Compose on your system
+2. Clone the repository:
+```bash
+git clone [your-repository-url]
+cd TextExtractPro
+```
+
+3. Build and run with Docker Compose:
+```bash
+docker-compose up --build
+```
+
+The application will be available at:
+- Flask interface: http://localhost:5000
+- FastAPI interface: http://localhost:8000
+
+### Option 2: Manual Installation
+
+If you prefer to run the application without Docker, follow these steps:
 
 1. Clone the repository:
 ```bash
@@ -86,6 +111,30 @@ export TESSERACT_CMD=/usr/bin/tesseract
 ```
 
 ## Running the Application
+
+### Using Docker
+
+1. Start the application:
+```bash
+docker-compose up
+```
+
+2. For development with auto-reload:
+```bash
+docker-compose up --build
+```
+
+3. To run in detached mode:
+```bash
+docker-compose up -d
+```
+
+4. To stop the application:
+```bash
+docker-compose down
+```
+
+### Manual Running
 
 You have several options to run the application:
 

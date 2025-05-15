@@ -78,20 +78,17 @@ document.addEventListener('DOMContentLoaded', function() {
         // Get selected preprocessing type (with fallback to default)
         const preprocessType = preprocessingTypeSelect ? preprocessingTypeSelect.value : 'default';
         formData.append('preprocess_type', preprocessType);
+        formData.append('auto_detect_language', 'false');
         
         // Get selected language (with fallback to English)
         const language = languageSelect ? languageSelect.value : 'eng';
         formData.append('language', language);
         
-        // Check if auto-detect is enabled
-        const autoDetect = autoDetectCheckbox && autoDetectCheckbox.checked;
-        formData.append('auto_detect_language', autoDetect);
-        
         // Show loading state
         if (processingSpinner) processingSpinner.style.display = 'block';
         if (resultContainer) resultContainer.style.display = 'none';
         
-        console.log(`Uploading file: ${file.name}, size: ${formatFileSize(file.size)}, type: ${preprocessType}, language: ${language}, auto-detect: ${autoDetect}`);
+        console.log(`Uploading file: ${file.name}, size: ${formatFileSize(file.size)}, type: ${preprocessType}, language: ${language}`);
         
         // Send request to server
         fetch('/upload/', {

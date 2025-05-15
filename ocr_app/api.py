@@ -17,7 +17,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from .image_processor import preprocess_image
 from .ocr import extract_text, clean_text
-from .language_detection import detect_language
 from .tracking import track_visitor, track_conversion, get_statistics
 
 # Configure logging
@@ -66,8 +65,7 @@ async def upload_image(
     request: Request,
     file: UploadFile = File(...),
     preprocess_type: str = Form("default"),
-    language: str = Form("eng"),
-    auto_detect_language: bool = Form(False)
+    language: str = Form("eng")
 ):
     """
     Upload an image and extract text using OCR.
@@ -76,8 +74,7 @@ async def upload_image(
         request: The HTTP request
         file: The image file to extract text from
         preprocess_type: Type of preprocessing to apply (default, grayscale, threshold, adaptive)
-        language: Language for OCR (eng, chi_sim, chi_tra, etc.)
-        auto_detect_language: Whether to automatically detect language
+        language: Language for OCR (eng, chi_sim)
     
     Returns:
         JSON response with extracted text and processed image path
@@ -110,15 +107,9 @@ async def upload_image(
         with open(temp_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # Auto detect language if requested
-        if auto_detect_language:
-            detected_language = detect_language(str(temp_path))
-            language = detected_language
-            logger.info(f"Auto-detected language: {language}")
-        
         # Validate language
-        if not language:
-            language = "eng"  # Default to English if not specified
+        if language not in ["eng", "chi_sim"]:
+            language = "eng"  # Default to English if invalid language
         
         logger.info(f"Processing image with language: {language}, preprocessing: {preprocess_type}")
         
@@ -144,6 +135,13 @@ async def upload_image(
         except Exception as e:
             logger.error(f"Error tracking conversion: {str(e)}")
         
+        # Clean up temporary file
+        try:
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+        except Exception as e:
+            logger.warning(f"Error cleaning up temp file: {e}")
+        
         # Return the extracted text and processing information
         return {
             "filename": file.filename,
@@ -156,6 +154,12 @@ async def upload_image(
     
     except Exception as e:
         logger.error(f"Error processing image: {str(e)}")
+        # Clean up temporary file in case of error
+        try:
+            if 'temp_path' in locals() and os.path.exists(temp_path):
+                os.unlink(temp_path)
+        except Exception as cleanup_error:
+            logger.warning(f"Error cleaning up temp file after error: {cleanup_error}")
         raise HTTPException(status_code=500, detail=f"Error processing image: {str(e)}")
 
 @app.post("/api/extract-text/")
@@ -163,8 +167,7 @@ async def extract_text_api(
     request: Request,
     file: UploadFile = File(...),
     preprocess_type: str = Form("default"),
-    language: str = Form("eng"),
-    auto_detect_language: bool = Form(False)
+    language: str = Form("eng")
 ):
     """
     API endpoint to extract text from an image.
@@ -173,8 +176,7 @@ async def extract_text_api(
         request: The HTTP request
         file: The image file to extract text from
         preprocess_type: Type of preprocessing to apply (default, grayscale, threshold, adaptive)
-        language: Language for OCR (eng, chi_sim, chi_tra, etc.)
-        auto_detect_language: Whether to automatically detect language
+        language: Language for OCR (eng, chi_sim)
     
     Returns:
         JSON response with extracted text
@@ -183,8 +185,7 @@ async def extract_text_api(
         request=request, 
         file=file, 
         preprocess_type=preprocess_type, 
-        language=language, 
-        auto_detect_language=auto_detect_language
+        language=language
     )
     
 @app.get("/api/statistics/")
@@ -227,14 +228,7 @@ async def get_languages():
     return {
         "languages": [
             {"id": "eng", "name": "English"},
-            {"id": "chi_sim", "name": "Chinese (Simplified)"},
-            {"id": "chi_tra", "name": "Chinese (Traditional)"},
-            {"id": "jpn", "name": "Japanese"},
-            {"id": "kor", "name": "Korean"},
-            {"id": "fra", "name": "French"},
-            {"id": "deu", "name": "German"},
-            {"id": "spa", "name": "Spanish"},
-            {"id": "rus", "name": "Russian"}
+            {"id": "chi_sim", "name": "Chinese (Simplified)"}
         ]
     }
     

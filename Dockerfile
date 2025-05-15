@@ -10,16 +10,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     libtesseract-dev \
-    # Install common language packs
+    # Install required language packs
     tesseract-ocr-eng \
     tesseract-ocr-chi-sim \
-    tesseract-ocr-chi-tra \
-    tesseract-ocr-jpn \
-    tesseract-ocr-kor \
-    tesseract-ocr-fra \
-    tesseract-ocr-deu \
-    tesseract-ocr-spa \
-    tesseract-ocr-rus \
     # Additional dependencies for OpenCV
     libgl1-mesa-glx \
     libglib2.0-0 \
