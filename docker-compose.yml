@@ -2,22 +2,37 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "5000:5000"  # Flask
       - "8000:8000"  # FastAPI
     volumes:
       - ./:/app
+      - /app/temp  # Exclude temp directory from volume mount
     environment:
       - FLASK_ENV=development
       - FLASK_DEBUG=1
       - FLASK_SECRET_KEY=dev_key_for_ocr_app
       - TESSERACT_CMD=/usr/bin/tesseract
       - TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
+      - PYTHONUNBUFFERED=1
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s 
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3" 
