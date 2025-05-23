@@ -1,25 +1,23 @@
 # TextExtractPro
 
-TextExtractPro is a powerful OCR (Optical Character Recognition) application that combines Flask and FastAPI to provide a robust text extraction service. The application allows users to extract text from images and documents efficiently.
+TextExtractPro is a powerful OCR (Optical Character Recognition) application built with FastAPI that provides a robust text extraction service. The application allows users to extract text from images and documents efficiently.
 
 ## Features
 
 - OCR processing for various image formats
-- RESTful API endpoints using FastAPI
-- Flask wrapper for enhanced functionality
+- RESTful API endpoints
+- Web interface for easy text extraction
 - Database integration for storing results
-- Easy deployment with multiple server options
 - Docker support for containerized deployment
 
 ## Tech Stack
 
 - Python
-- Flask (Web framework for proxy and main application)
-- FastAPI (API framework)
+- FastAPI (Web framework)
 - Uvicorn (ASGI server)
 - SQLAlchemy (Database ORM)
 - Tesseract OCR (OCR engine)
-- Other dependencies specified in `pyproject.toml`
+- PostgreSQL (Database)
 
 ## Prerequisites
 
@@ -45,7 +43,11 @@ sudo apt install libtesseract-dev
 brew install tesseract
 ```
 
-### 2. Verify Installation
+### 2. Install PostgreSQL
+- Download and install PostgreSQL from [postgresql.org](https://www.postgresql.org/download/)
+- Create a database for the application
+
+### 3. Verify Installation
 ```bash
 tesseract --version
 ```
@@ -55,16 +57,19 @@ tesseract --version
 ```
 TextExtractPro/
 ├── ocr_app/           # Main OCR application package
+│   ├── api.py        # FastAPI application and routes
+│   ├── ocr.py        # OCR processing functions
+│   └── image_processor.py # Image preprocessing
 ├── static/            # Static files
 ├── templates/         # HTML templates
-├── main.py           # Flask application wrapper
+├── main.py           # Application entry point
 ├── database.py       # Database configuration
 ├── models.py         # Database models
-├── pyproject.toml    # Project dependencies
-└── various .sh files # Server startup scripts
+├── requirements.txt  # Python dependencies
+└── docker-compose.yml # Docker configuration
 ```
 
-## Installation Options
+## Installation
 
 ### Option 1: Docker (Recommended)
 
@@ -83,12 +88,10 @@ docker-compose up --build
 ```
 
 The application will be available at:
-- Flask interface: http://localhost:5000
-- FastAPI interface: http://localhost:8000
+- Web interface: http://localhost:5000
+- API documentation: http://localhost:5000/docs
 
 ### Option 2: Manual Installation
-
-If you prefer to run the application without Docker, follow these steps:
 
 1. Clone the repository:
 ```bash
@@ -96,17 +99,30 @@ git clone [your-repository-url]
 cd TextExtractPro
 ```
 
-2. Install Python dependencies:
+2. Create and activate a virtual environment:
+```bash
+# Windows
+python -m venv venv
+.\venv\Scripts\activate
+
+# Linux/macOS
+python -m venv venv
+source venv/bin/activate
+```
+
+3. Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Set environment variables (optional):
+4. Set environment variables (optional):
 ```bash
 # Windows
+set PORT=5000
 set TESSERACT_CMD=C:\Program Files\Tesseract-OCR\tesseract.exe
 
 # Linux/macOS
+export PORT=5000
 export TESSERACT_CMD=/usr/bin/tesseract
 ```
 
@@ -136,39 +152,37 @@ docker-compose down
 
 ### Manual Running
 
-You have several options to run the application:
-
-1. Using Flask development server:
+Simply run the main application file:
 ```bash
-python run_flask.py
+python main.py
 ```
 
-2. Using the start scripts:
-```bash
-# Using Flask
-./start_app.sh
-
-# Using Uvicorn directly
-./start_uvicorn.sh
-
-# Using custom workflow
-./custom_workflow.sh
-```
-
-The application will start on port 5000 (Flask) and the FastAPI service will run on port 8000.
+The application will automatically:
+- Start the FastAPI server on port 5000
+- Set up the database connection
+- Handle cleanup when the application is stopped
 
 ## API Endpoints
 
-The application provides various API endpoints through FastAPI. Access the API documentation at:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
+The application provides various API endpoints. Access the API documentation at:
+- Swagger UI: `http://localhost:5000/docs`
+- ReDoc: `http://localhost:5000/redoc`
+
+Available endpoints:
+- `GET /`: Web interface for text extraction
+- `POST /upload/`: Upload and process an image
+- `POST /api/extract-text/`: API endpoint for text extraction
+- `GET /api/statistics/`: Get usage statistics
+- `GET /api/preprocessing-types/`: Get available preprocessing types
+- `GET /api/languages/`: Get supported OCR languages
+- `POST /api/detect-language/`: Detect image language
+- `POST /api/clean-text/`: Clean extracted text
 
 ## Configuration
 
 The application can be configured through environment variables:
-- `FLASK_SECRET_KEY`: Secret key for Flask application (default: 'dev_key_for_ocr_app')
+- `PORT`: Port to run the application on (default: 5000)
 - `TESSERACT_CMD`: Path to Tesseract executable (if not in system PATH)
-- Additional configuration can be set in the respective configuration files
 
 ## Troubleshooting
 
@@ -179,7 +193,12 @@ The application can be configured through environment variables:
    - Check if Tesseract is in your PATH
    - Set the `TESSERACT_CMD` environment variable to the full path of the Tesseract executable
 
-2. **OCR Quality Issues**
+2. **Database Connection Issues**
+   - Ensure PostgreSQL is running
+   - Check database credentials and connection settings
+   - Verify database exists and is accessible
+
+3. **OCR Quality Issues**
    - Ensure input images are clear and well-lit
    - Try preprocessing images before OCR
    - Consider using different Tesseract language packs for non-English text

@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 # Create FastAPI app
 app = FastAPI(
-    title="OCR Application",
+    title="JOCO OCR Application",
     description="An application for extracting text from images using Tesseract OCR",
     version="1.0.0",
 )

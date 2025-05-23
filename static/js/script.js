@@ -53,6 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if (imagePreview) {
                 imagePreview.src = e.target.result;
                 imagePreview.style.display = 'block';
+                // Hide the drop zone text when image is previewed
+                const dropZoneText = dropZone.querySelector('.drop-zone-text');
+                if (dropZoneText) {
+                    dropZoneText.style.display = 'none';
+                }
             }
         };
         reader.onerror = function() {
@@ -85,7 +90,10 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('language', language);
         
         // Show loading state
-        if (processingSpinner) processingSpinner.style.display = 'block';
+        if (processingSpinner) {
+            processingSpinner.style.display = 'block';
+            processingSpinner.querySelector('p').textContent = 'Processing your image...';
+        }
         if (resultContainer) resultContainer.style.display = 'none';
         
         console.log(`Uploading file: ${file.name}, size: ${formatFileSize(file.size)}, type: ${preprocessType}, language: ${language}`);
@@ -149,7 +157,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .finally(() => {
             // Hide loading spinner
-            if (processingSpinner) processingSpinner.style.display = 'none';
+            if (processingSpinner) {
+                processingSpinner.style.display = 'none';
+                processingSpinner.querySelector('p').textContent = 'Processing your image...';
+            }
         });
     }
 
