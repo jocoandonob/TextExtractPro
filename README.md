@@ -1,7 +1,7 @@
 # TextExtractPro
 
 <div align="center">
-  <img src="thumbnail.png" alt="TextExtractPro Logo" width="200" height="200">
+  <img src="thumbnail.png" alt="TextExtractPro Logo" width="1200" height="600">
   <br>
   <p><em>Extract text from images with ease</em></p>
 </div>
