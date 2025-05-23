@@ -1,5 +1,11 @@
 # TextExtractPro
 
+<div align="center">
+  <img src="thumbnail.png" alt="TextExtractPro Logo" width="200" height="200">
+  <br>
+  <p><em>Extract text from images with ease</em></p>
+</div>
+
 TextExtractPro is a powerful OCR (Optical Character Recognition) application built with FastAPI that provides a robust text extraction service. The application allows users to extract text from images and documents efficiently.
 
 ## Features
